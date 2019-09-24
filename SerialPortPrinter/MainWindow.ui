@@ -24,7 +24,11 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QComboBox" name="comboBox"/>
+       <widget class="QPushButton" name="portOpenButton">
+        <property name="text">
+         <string>Połącz</string>
+        </property>
+       </widget>
       </item>
       <item>
        <spacer name="horizontalSpacer">
@@ -42,7 +46,7 @@
      </layout>
     </item>
     <item>
-     <widget class="QTextBrowser" name="textBrowser">
+     <widget class="QTextBrowser" name="fileContentBrowser">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
         <horstretch>0</horstretch>
@@ -54,9 +58,9 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="fileOpenButton">
         <property name="text">
-         <string>PushButton</string>
+         <string>Otwórz plik</string>
         </property>
        </widget>
       </item>
@@ -77,7 +81,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="fileNameLabel">
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -130,16 +134,16 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="sendButton">
         <property name="text">
-         <string>PushButton</string>
+         <string>Wyślij</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_3">
+       <widget class="QPushButton" name="cancelButton">
         <property name="text">
-         <string>PushButton</string>
+         <string>Anuluj</string>
         </property>
        </widget>
       </item>
@@ -156,8 +160,20 @@
      <height>20</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuMenu">
+    <property name="title">
+     <string>Menu</string>
+    </property>
+    <addaction name="actionUstawienia_portu"/>
+   </widget>
+   <addaction name="menuMenu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionUstawienia_portu">
+   <property name="text">
+    <string>Ustawienia portu</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
