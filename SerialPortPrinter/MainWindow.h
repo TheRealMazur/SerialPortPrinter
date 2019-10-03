@@ -8,6 +8,9 @@
 #include <QTextStream>
 #include <QMessageBox>
 
+#include "settingsdialog.h"
+#include "SerialPortManager.h"
+
 #include <string>
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -29,11 +32,10 @@ class MainWindow : public QMainWindow {
  private slots:
   void openSerialPort();
   void closeSerialPort();
-  void about();
-  void writeData(const QByteArray &data);
-  void readData();
+  void showAboutDialog();
+  void showAboutQtDialog();
 
-  void handleError(QSerialPort::SerialPortError error);
+  void handleError(QString error);
   void on_portOpenButton_released();
 
   void on_fileOpenButton_released();
@@ -43,13 +45,13 @@ class MainWindow : public QMainWindow {
  private:
   void initActionsConnections();
   void showStatusMessage(const QString &message);
-  void logPortInfo(const QSerialPortInfo &info);
-  QMessageLogger mLogger;
-  QString mFileContent;
-  SettingsDialog *mSettings = nullptr;
-  QSerialPort *mSerial = nullptr;
-  Ui::MainWindow *ui;
-  void getPortsInfo();
   void openFileAndReadContent(const QString &fileName);
+  char getCheckSum(QByteArray data);
+  QMessageLogger* mLogger = nullptr;
+  QByteArray mFileContent = {};
+  QList<QByteArray> mCommandList;
+  SettingsDialog *mSettings = nullptr;
+  SerialPortManager mSerialPortManager;
+  Ui::MainWindow *ui = nullptr;
 };
 #endif  // MAINWINDOW_H
