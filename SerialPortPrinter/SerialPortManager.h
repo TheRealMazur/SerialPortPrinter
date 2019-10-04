@@ -11,7 +11,7 @@
 class SerialPortManager : public QObject {
   Q_OBJECT
  public:
-  SerialPortManager(QMessageLogger* messageLogger);
+  SerialPortManager();
   bool openSerialPort(const SettingsDialog::Settings& settings);
   void closeSerialPort();
   void writeData(const QByteArray& data);
@@ -25,7 +25,6 @@ class SerialPortManager : public QObject {
  private:
   void getPortsInfo();
   void logPortInfo(const QSerialPortInfo& info);
-  QMessageLogger* mLogger;
   QSerialPort mSerial;
 };
 

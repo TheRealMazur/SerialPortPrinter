@@ -1,7 +1,6 @@
 #include "SerialPortManager.h"
 
-SerialPortManager::SerialPortManager(QMessageLogger* messageLogger)
-    : mLogger(messageLogger) {
+SerialPortManager::SerialPortManager() {
   connect(&mSerial, &QSerialPort::errorOccurred, this,
           &SerialPortManager::handleError);
   connect(&mSerial, &QSerialPort::readyRead, this,
@@ -30,7 +29,6 @@ void SerialPortManager::logPortInfo(const QSerialPortInfo& info) {
            : QString()) +
       "\n" + QObject::tr("Busy: ") +
       (info.isBusy() ? QObject::tr("Yes") : QObject::tr("No")) + "\n";
-  mLogger->debug("%s", qPrintable(s));
 }
 
 bool SerialPortManager::openSerialPort(
@@ -42,14 +40,6 @@ bool SerialPortManager::openSerialPort(
   mSerial.setStopBits(settings.stopBits);
   mSerial.setFlowControl(settings.flowControl);
   if (mSerial.open(QIODevice::ReadWrite)) {
-    mLogger->debug("%s",
-                   qPrintable(QString(tr("Connected to %1 : %2, %3, %4, %5, %6")
-                                          .arg(settings.name)
-                                          .arg(settings.stringBaudRate)
-                                          .arg(settings.stringDataBits)
-                                          .arg(settings.stringParity)
-                                          .arg(settings.stringStopBits)
-                                          .arg(settings.stringFlowControl))));
     return true;
   } else {
     emit serialPortError(mSerial.errorString());
@@ -62,10 +52,7 @@ void SerialPortManager::closeSerialPort() {
 }
 
 void SerialPortManager::writeData(const QByteArray& data) {
-  mLogger->debug("Write data: %s", qPrintable(data));
-  mLogger->debug("Write data hex: %s", qPrintable(data.toHex(' ')));
   qint64 numOfBytesWritten = mSerial.write(data);
-  mLogger->debug("Wrote %lld byte(s) from %d.", numOfBytesWritten, data.size());
   if (numOfBytesWritten != data.size()) {
     emit serialPortError(
         QString("Did not write all bytes. Wrote %1 byte(s) from %2.")
@@ -78,7 +65,6 @@ bool SerialPortManager::isPortOpen() { return mSerial.isOpen(); }
 
 void SerialPortManager::readData() {
   const QByteArray data = mSerial.readAll();
-  mLogger->debug("Read data: %s", qPrintable(data));
 }
 
 void SerialPortManager::handleError(QSerialPort::SerialPortError error) {

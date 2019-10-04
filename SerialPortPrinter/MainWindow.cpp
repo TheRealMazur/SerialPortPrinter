@@ -4,9 +4,8 @@
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent),
-      mLogger(new QMessageLogger),
       mSettings(new SettingsDialog),
-      mSerialPortManager(mLogger),
+      mSerialPortManager(),
       ui(new Ui::MainWindow) {
   ui->setupUi(this);
   ui->fileNameLabel->hide();
@@ -27,7 +26,6 @@ MainWindow::MainWindow(QWidget* parent)
 MainWindow::~MainWindow() {
   delete ui;
   delete mSettings;
-  delete mLogger;
 }
 
 void MainWindow::openSerialPort() {
@@ -56,7 +54,6 @@ void MainWindow::closeSerialPort() {
 }
 
 void MainWindow::on_portOpenButton_released() {
-  mLogger->debug("on_portOpenButton_released");
   if (mSerialPortManager.isPortOpen()) {
     closeSerialPort();
   } else {
@@ -143,10 +140,8 @@ char MainWindow::getCheckSum(QByteArray data) {
 }
 
 void MainWindow::on_fileOpenButton_released() {
-  mLogger->debug("on_fileOpenButton_released");
   QString fileName = QFileDialog::getOpenFileName(this, tr("Wybierz plik"), "",
                                                   tr("Pliki druku (*.rct)"));
-  mLogger->debug("File chosen: %s", qPrintable(fileName));
   if (!fileName.isEmpty()) {
     ui->fileNameLabel->hide();
     ui->fileNameLabel->setText(fileName);
