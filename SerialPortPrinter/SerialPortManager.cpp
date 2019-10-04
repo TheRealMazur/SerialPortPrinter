@@ -82,10 +82,10 @@ void SerialPortManager::readData() {
 }
 
 void SerialPortManager::handleError(QSerialPort::SerialPortError error) {
-  if (error == QSerialPort::ResourceError) {
-    closeSerialPort();
-  }
   if (error != QSerialPort::NoError) {
+    if (error == QSerialPort::ResourceError) {
+      closeSerialPort();
+    }
     emit serialPortError(mSerial.errorString());
   }
 }

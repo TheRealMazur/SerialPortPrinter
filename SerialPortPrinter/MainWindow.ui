@@ -46,13 +46,27 @@
      </layout>
     </item>
     <item>
-     <widget class="QTextBrowser" name="fileContentBrowser">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
+     <widget class="QTableWidget" name="tableWidget">
+      <column>
+       <property name="text">
+        <string>Nazwa</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Ilość</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Cena</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Koszt</string>
+       </property>
+      </column>
      </widget>
     </item>
     <item>
