@@ -10,17 +10,9 @@ MainWindow::MainWindow(QWidget* parent)
   ui->setupUi(this);
   ui->fileNameLabel->hide();
   ui->sendButton->setEnabled(false);
-  connect(&mSerialPortManager, &SerialPortManager::serialPortError, this,
-          &MainWindow::handleError);
-  connect(ui->actionUstawienia_portu, &QAction::triggered, mSettings,
-          &SettingsDialog::show);
-
-  connect(ui->actionAbout_Qt, &QAction::triggered, this,
-          &MainWindow::showAboutQtDialog);
-  connect(ui->actionInformacje, &QAction::triggered, this,
-          &MainWindow::showAboutDialog);
   ui->tableWidget->horizontalHeader()->setSectionResizeMode(
       QHeaderView::Stretch);
+  makeConnections();
 }
 
 MainWindow::~MainWindow() {
@@ -53,90 +45,32 @@ void MainWindow::closeSerialPort() {
   showStatusMessage(tr("Rozłączono"));
 }
 
+void MainWindow::handleError(QString error) {
+  QMessageBox::critical(this, tr("Critical Error"), error);
+}
+
+void MainWindow::showAboutDialog() {
+  QMessageBox msgBox;
+  msgBox.setTextFormat(Qt::RichText);
+  msgBox.setWindowTitle("O programie");
+  msgBox.setText("<a href=\"http://www.example.cz/?url=www%25www\">Link</a>");
+  msgBox.setText(
+      "This software is licensed under LGPLv3 License<br>"
+      "Created with <a href=\"https://www.qt.io/\">Qt 5.13.1</a><br>"
+      "More info under:<br>"
+      "<a href=\"https://github.com/krzmazur1/SerialPortPrinter\">"
+      "https://github.com/krzmazur1/SerialPortPrinter</a>");
+  msgBox.exec();
+}
+
+void MainWindow::showAboutQtDialog() { QMessageBox::aboutQt(this); }
+
 void MainWindow::on_portOpenButton_released() {
   if (mSerialPortManager.isPortOpen()) {
     closeSerialPort();
   } else {
     openSerialPort();
   }
-}
-
-void MainWindow::getCommandsFromJson(const QJsonObject& jsonObject) {
-  QJsonArray dataArray = jsonObject.value("data").toArray();
-  for (auto value : dataArray) {
-    mCommandList.append(value.toString().toLocal8Bit());
-  }
-}
-
-void MainWindow::fillTableRow(const int& currentRow,
-                              const QJsonObject& previewObject) {
-  QString name = previewObject.value("name").toString();
-  QString amount = previewObject.value("amount").toString();
-  QString price = previewObject.value("price").toString();
-  QString total = previewObject.value("total").toString();
-
-  ui->tableWidget->setItem(currentRow, 0, new QTableWidgetItem(name));
-  ui->tableWidget->setItem(currentRow, 1, new QTableWidgetItem(amount));
-  ui->tableWidget->setItem(currentRow, 2, new QTableWidgetItem(price));
-  ui->tableWidget->setItem(currentRow, 3, new QTableWidgetItem(total));
-}
-
-void MainWindow::fillTableWidgetFromJson(const QJsonObject& jsonObject) {
-  auto previewJsonObject = jsonObject.value("preview").toObject();
-  ui->tableWidget->setRowCount(0);
-  for (auto value : previewJsonObject) {
-    ui->tableWidget->insertRow(ui->tableWidget->rowCount());
-    int currentRow = ui->tableWidget->rowCount() - 1;
-
-    QJsonObject previewObject = value.toObject();
-    fillTableRow(currentRow, previewObject);
-  }
-}
-
-bool MainWindow::parseFileContent(QString& fileContent) {
-  fileContent.replace(QRegularExpression(" CR "), " \r ");
-  mFileContent = QJsonDocument::fromJson(fileContent.toLocal8Bit());
-  QJsonObject jsonObject = mFileContent.object();
-  if (jsonObject.keys().size() != 2) {
-    return false;
-  }
-  getCommandsFromJson(jsonObject);
-  fillTableWidgetFromJson(jsonObject);
-
-  return true;
-}
-
-void MainWindow::handleOpenedFile(QString& fileContent) {
-  if (parseFileContent(fileContent)) {
-    ui->fileNameLabel->show();
-    this->statusBar()->showMessage("Otwarto plik.");
-    if (mSerialPortManager.isPortOpen()) {
-      ui->sendButton->setEnabled(true);
-    }
-  } else {
-    QMessageBox::warning(this, "Błąd pliku", "Błędna zawartość pliku");
-  }
-}
-
-void MainWindow::openFileAndReadContent(const QString& fileName) {
-  QFile file(fileName);
-  file.open(QIODevice::ReadOnly);
-  if (file.isOpen()) {
-    QString fileContent = file.readAll();
-    file.close();
-    handleOpenedFile(fileContent);
-
-  } else {
-    QMessageBox::warning(this, "Błąd pliku", "Nie udało się otworzyć pliku");
-  }
-}
-
-char MainWindow::getCheckSum(QByteArray data) {
-  char out = static_cast<char>(0xFF);
-  for (char ch : data) {
-    out = out ^ ch;
-  }
-  return out;
 }
 
 void MainWindow::on_fileOpenButton_released() {
@@ -159,26 +93,106 @@ void MainWindow::on_sendButton_released() {
   }
 }
 
+char MainWindow::getCheckSum(const QByteArray& data) {
+  char out = static_cast<char>(0xFF);
+  for (char ch : data) {
+    out = out ^ ch;
+  }
+  return out;
+}
+
+void MainWindow::on_cancelButton_released() {
+  if (mSerialPortManager.isPortOpen()) {
+    closeSerialPort();
+  }
+  clearTableWidget();
+  ui->fileNameLabel->hide();
+}
+
+void MainWindow::makeConnections() {
+  connect(&mSerialPortManager, &SerialPortManager::serialPortError, this,
+          &MainWindow::handleError);
+  connect(ui->actionUstawienia_portu, &QAction::triggered, mSettings,
+          &SettingsDialog::show);
+
+  connect(ui->actionAbout_Qt, &QAction::triggered, this,
+          &MainWindow::showAboutQtDialog);
+  connect(ui->actionInformacje, &QAction::triggered, this,
+          &MainWindow::showAboutDialog);
+}
+
 void MainWindow::showStatusMessage(const QString& message) {
   this->statusBar()->showMessage(message);
 }
 
-void MainWindow::showAboutDialog() {
-  QMessageBox msgBox;
-  msgBox.setTextFormat(Qt::RichText);
-  msgBox.setWindowTitle("O programie");
-  msgBox.setText("<a href=\"http://www.example.cz/?url=www%25www\">Link</a>");
-  msgBox.setText(
-      "This software is licensed under LGPLv3 License<br>"
-      "Created with <a href=\"https://www.qt.io/\">Qt 5.13.1</a><br>"
-      "More info under:<br>"
-      "<a href=\"https://github.com/krzmazur1/SerialPortPrinter\">"
-      "https://github.com/krzmazur1/SerialPortPrinter</a>");
-  msgBox.exec();
+void MainWindow::openFileAndReadContent(const QString& fileName) {
+  QFile file(fileName);
+  file.open(QIODevice::ReadOnly);
+  if (file.isOpen()) {
+    QString fileContent = file.readAll();
+    file.close();
+    handleOpenedFile(fileContent);
+
+  } else {
+    QMessageBox::warning(this, "Błąd pliku", "Nie udało się otworzyć pliku");
+  }
 }
 
-void MainWindow::showAboutQtDialog() { QMessageBox::aboutQt(this); }
-
-void MainWindow::handleError(QString error) {
-  QMessageBox::critical(this, tr("Critical Error"), error);
+void MainWindow::handleOpenedFile(QString& fileContent) {
+  if (parseFileContent(fileContent)) {
+    ui->fileNameLabel->show();
+    this->statusBar()->showMessage("Otwarto plik.");
+    if (mSerialPortManager.isPortOpen()) {
+      ui->sendButton->setEnabled(true);
+    }
+  } else {
+    QMessageBox::warning(this, "Błąd pliku", "Błędna zawartość pliku");
+  }
 }
+
+bool MainWindow::parseFileContent(QString& fileContent) {
+  fileContent.replace(QRegularExpression(" CR "), " \r ");
+  mFileContent = QJsonDocument::fromJson(fileContent.toLocal8Bit());
+  QJsonObject jsonObject = mFileContent.object();
+  if (jsonObject.keys().size() != 2) {
+    return false;
+  }
+  getCommandsFromJson(jsonObject);
+  fillTableWidgetFromJson(jsonObject);
+
+  return true;
+}
+
+void MainWindow::getCommandsFromJson(const QJsonObject& jsonObject) {
+  QJsonArray dataArray = jsonObject.value("data").toArray();
+  for (auto value : dataArray) {
+    mCommandList.append(value.toString().toLocal8Bit());
+  }
+}
+
+void MainWindow::fillTableWidgetFromJson(const QJsonObject& jsonObject) {
+  auto previewJsonObject = jsonObject.value("preview").toObject();
+  clearTableWidget();
+  for (auto value : previewJsonObject) {
+    ui->tableWidget->insertRow(ui->tableWidget->rowCount());
+    int currentRow = ui->tableWidget->rowCount() - 1;
+
+    QJsonObject previewObject = value.toObject();
+    fillTableRow(currentRow, previewObject);
+  }
+}
+
+void MainWindow::fillTableRow(const int& currentRow,
+                              const QJsonObject& previewObject) {
+  QString name = previewObject.value("name").toString();
+  QString amount = previewObject.value("amount").toString();
+  QString price = previewObject.value("price").toString();
+  QString total = previewObject.value("total").toString();
+
+  ui->tableWidget->setItem(currentRow, 0, new QTableWidgetItem(name));
+  ui->tableWidget->setItem(currentRow, 1, new QTableWidgetItem(amount));
+  ui->tableWidget->setItem(currentRow, 2, new QTableWidgetItem(price));
+  ui->tableWidget->setItem(currentRow, 3, new QTableWidgetItem(total));
+}
+
+void MainWindow::clearTableWidget() { ui->tableWidget->setRowCount(0); }
