@@ -53,6 +53,7 @@ class MainWindow : public QMainWindow {
   void fillTableWidgetFromJson(const QJsonObject &jsonObject);
   void fillTableRow(const int &currentRow, const QJsonObject &previewObject);
   void clearTableWidget();
+  void handleDataFromPort(const QByteArray &data);
 
   QMessageLogger *mLogger = nullptr;
   QJsonDocument mFileContent = {};

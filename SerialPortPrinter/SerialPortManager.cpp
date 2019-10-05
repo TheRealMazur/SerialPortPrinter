@@ -78,6 +78,7 @@ bool SerialPortManager::isPortOpen() { return mSerial.isOpen(); }
 
 void SerialPortManager::readData() {
   const QByteArray data = mSerial.readAll();
+  emit readDataFromPort(data);
   mLogger->debug("Read data: %s", qPrintable(data));
 }
 

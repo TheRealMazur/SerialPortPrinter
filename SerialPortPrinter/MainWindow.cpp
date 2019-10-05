@@ -47,7 +47,7 @@ void MainWindow::closeSerialPort() {
   showStatusMessage(tr("Rozłączono"));
 }
 
-void MainWindow::handleError(const QString &error) {
+void MainWindow::handleError(const QString& error) {
   QMessageBox::critical(this, tr("Critical Error"), error);
 }
 
@@ -117,9 +117,10 @@ void MainWindow::on_cancelButton_released() {
 void MainWindow::makeConnections() {
   connect(&mSerialPortManager, &SerialPortManager::serialPortError, this,
           &MainWindow::handleError);
+  connect(&mSerialPortManager, &SerialPortManager::readDataFromPort, this,
+          &MainWindow::handleDataFromPort);
   connect(ui->actionUstawienia_portu, &QAction::triggered, mSettings,
           &SettingsDialog::show);
-
   connect(ui->actionAbout_Qt, &QAction::triggered, this,
           &MainWindow::showAboutQtDialog);
   connect(ui->actionInformacje, &QAction::triggered, this,
@@ -201,3 +202,7 @@ void MainWindow::fillTableRow(const int& currentRow,
 }
 
 void MainWindow::clearTableWidget() { ui->tableWidget->setRowCount(0); }
+
+void MainWindow::handleDataFromPort(const QByteArray& data) {
+  showStatusMessage(QString("Odebrano dane: ") + data);
+}
