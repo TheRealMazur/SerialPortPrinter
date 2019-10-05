@@ -24,8 +24,6 @@ class SerialPortManager : public QObject {
   void readDataFromPort(const QByteArray& dataGot);
 
  private:
-  void getPortsInfo();
-  void logPortInfo(const QSerialPortInfo& info);
   QSerialPort mSerial;
 };
 
