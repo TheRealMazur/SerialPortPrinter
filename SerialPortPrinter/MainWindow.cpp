@@ -68,7 +68,7 @@ void MainWindow::showAboutDialog() {
   msgBox.setTextFormat(Qt::RichText);
   msgBox.setWindowTitle("O programie");
   msgBox.setText(
-      "SerialPortPrinter v0.3<br>"
+      "SerialPortPrinter v0.3.0<br>"
       "This software is licensed under LGPLv3 License<br>"
       "Created with <a href=\"https://www.qt.io/\">Qt 5.13.1</a><br>"
       "More info under:<br>"
