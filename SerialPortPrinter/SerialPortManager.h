@@ -20,7 +20,7 @@ class SerialPortManager : public QObject {
   void readData();
   void handleError(QSerialPort::SerialPortError error);
  signals:
-  void serialPortError(QString error);
+  void serialPortError(const QString& error);
 
  private:
   void getPortsInfo();

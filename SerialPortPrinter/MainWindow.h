@@ -33,7 +33,7 @@ class MainWindow : public QMainWindow {
  private slots:
   void openSerialPort();
   void closeSerialPort();
-  void handleError(QString error);
+  void handleError(const QString &error);
   void showAboutDialog();
   void showAboutQtDialog();
 
