@@ -64,8 +64,8 @@ void MainWindow::showAboutDialog() {
   QMessageBox msgBox;
   msgBox.setTextFormat(Qt::RichText);
   msgBox.setWindowTitle("O programie");
-  msgBox.setText("<a href=\"http://www.example.cz/?url=www%25www\">Link</a>");
   msgBox.setText(
+      "SerialPortPrinter v0.3<br>"
       "This software is licensed under LGPLv3 License<br>"
       "Created with <a href=\"https://www.qt.io/\">Qt 5.13.1</a><br>"
       "More info under:<br>"
