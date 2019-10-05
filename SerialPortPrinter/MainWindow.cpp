@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget* parent)
       mSettings(new SettingsDialog),
       mSerialPortManager(),
       ui(new Ui::MainWindow) {
+  setAcceptDrops(true);
   ui->setupUi(this);
   ui->fileNameLabel->hide();
   ui->sendButton->setEnabled(false);
@@ -18,6 +19,16 @@ MainWindow::MainWindow(QWidget* parent)
 MainWindow::~MainWindow() {
   delete ui;
   delete mSettings;
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent* event) {
+  QString filePath = event->mimeData()->urls().first().toLocalFile();
+  if (filePath.endsWith("rct")) event->acceptProposedAction();
+}
+
+void MainWindow::dropEvent(QDropEvent* event) {
+  QString filePath = event->mimeData()->urls().first().toLocalFile();
+  openFileAndReadContent(filePath);
 }
 
 void MainWindow::openSerialPort() {
@@ -77,8 +88,6 @@ void MainWindow::on_fileOpenButton_released() {
   QString fileName = QFileDialog::getOpenFileName(this, tr("Wybierz plik"), "",
                                                   tr("Pliki druku (*.rct)"));
   if (!fileName.isEmpty()) {
-    ui->fileNameLabel->hide();
-    ui->fileNameLabel->setText(fileName);
     openFileAndReadContent(fileName);
   }
 }
@@ -127,9 +136,12 @@ void MainWindow::showStatusMessage(const QString& message) {
 }
 
 void MainWindow::openFileAndReadContent(const QString& fileName) {
+  ui->fileNameLabel->hide();
+  ui->fileNameLabel->setText(fileName);
   QFile file(fileName);
   file.open(QIODevice::ReadOnly);
   if (file.isOpen()) {
+    ui->fileNameLabel->show();
     QString fileContent = file.readAll();
     file.close();
     handleOpenedFile(fileContent);
@@ -141,7 +153,6 @@ void MainWindow::openFileAndReadContent(const QString& fileName) {
 
 void MainWindow::handleOpenedFile(QString& fileContent) {
   if (parseFileContent(fileContent)) {
-    ui->fileNameLabel->show();
     this->statusBar()->showMessage("Otwarto plik.");
     if (mSerialPortManager.isPortOpen()) {
       ui->sendButton->setEnabled(true);

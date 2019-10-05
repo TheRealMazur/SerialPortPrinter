@@ -1,12 +1,14 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QDragEnterEvent>
 #include <QFileDialog>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMainWindow>
 #include <QMessageBox>
+#include <QMimeData>
 #include <QRegularExpression>
 #include <QTextStream>
 #include <QtSerialPort/QSerialPort>
@@ -31,6 +33,8 @@ class MainWindow : public QMainWindow {
   ~MainWindow();
 
  private slots:
+  void dragEnterEvent(QDragEnterEvent *event);
+  void dropEvent(QDropEvent *event);
   void openSerialPort();
   void closeSerialPort();
   void handleError(const QString &error);
