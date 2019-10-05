@@ -47,7 +47,7 @@ void MainWindow::closeSerialPort() {
   showStatusMessage(tr("Rozłączono"));
 }
 
-void MainWindow::handleError(QString error) {
+void MainWindow::handleError(const QString &error) {
   QMessageBox::critical(this, tr("Critical Error"), error);
 }
 
