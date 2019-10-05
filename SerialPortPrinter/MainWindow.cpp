@@ -14,6 +14,9 @@ MainWindow::MainWindow(QWidget* parent)
   ui->tableWidget->horizontalHeader()->setSectionResizeMode(
       QHeaderView::Stretch);
   makeConnections();
+  if(QApplication::arguments().size() > 1){
+     openFileAndReadContent(QApplication::arguments().last());
+  }
 }
 
 MainWindow::~MainWindow() {
