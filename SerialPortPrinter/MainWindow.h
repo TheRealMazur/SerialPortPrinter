@@ -33,7 +33,8 @@ class MainWindow : public QMainWindow {
  public:
   explicit MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
- bool nativeEvent(const QByteArray &eventType, void *message, long *result);
+  bool nativeEvent(const QByteArray &eventType, void *message, long *result);
+  static const unsigned long long copydataIdentifier = 1234;
  private slots:
   void dragEnterEvent(QDragEnterEvent *event);
   void dropEvent(QDropEvent *event);
@@ -60,7 +61,6 @@ class MainWindow : public QMainWindow {
   void fillTableRow(const int &currentRow, const QJsonObject &previewObject);
   void clearTableWidget();
   void handleDataFromPort(const QByteArray &data);
-
   QJsonDocument mFileContent = {};
   QList<QByteArray> mCommandList;
   SettingsDialog *mSettings = nullptr;
