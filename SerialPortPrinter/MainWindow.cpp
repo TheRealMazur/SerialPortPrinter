@@ -14,14 +14,32 @@ MainWindow::MainWindow(QWidget* parent)
   ui->tableWidget->horizontalHeader()->setSectionResizeMode(
       QHeaderView::Stretch);
   makeConnections();
-  if(QApplication::arguments().size() > 1){
-     openFileAndReadContent(QApplication::arguments().last());
+  if (QApplication::arguments().size() > 1) {
+    openFileAndReadContent(QApplication::arguments().last());
   }
 }
 
 MainWindow::~MainWindow() {
   delete ui;
   delete mSettings;
+}
+
+bool MainWindow::nativeEvent(const QByteArray& eventType, void* message,
+                             long* result) {
+  if (eventType == "windows_generic_MSG") {
+    MSG* msg = static_cast<MSG*>(message);
+    if (msg->message == WM_COPYDATA) {
+      COPYDATASTRUCT* pcds = reinterpret_cast<COPYDATASTRUCT*>(msg->lParam);
+      if (pcds->dwData == 1234) {
+        this->showNormal();
+        this->activateWindow();
+        QString str = reinterpret_cast<char*>(pcds->lpData);
+        QUrl url = QUrl::fromUserInput(str);
+        openFileAndReadContent(url.toLocalFile());
+      }
+    }
+  }
+  return QMainWindow::nativeEvent(eventType, message, result);
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* event) {

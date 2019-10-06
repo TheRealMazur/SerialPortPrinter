@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <windows.h>
+
 #include <QDragEnterEvent>
 #include <QFileDialog>
 #include <QJsonArray>
@@ -31,7 +33,7 @@ class MainWindow : public QMainWindow {
  public:
   explicit MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
-
+ bool nativeEvent(const QByteArray &eventType, void *message, long *result);
  private slots:
   void dragEnterEvent(QDragEnterEvent *event);
   void dropEvent(QDropEvent *event);
