@@ -30,7 +30,7 @@ bool MainWindow::nativeEvent(const QByteArray& eventType, void* message,
     MSG* msg = static_cast<MSG*>(message);
     if (msg->message == WM_COPYDATA) {
       COPYDATASTRUCT* pcds = reinterpret_cast<COPYDATASTRUCT*>(msg->lParam);
-      if (pcds->dwData == 1234) {
+      if (pcds->dwData == copydataIdentifier) {
         this->showNormal();
         this->activateWindow();
         QString str = reinterpret_cast<char*>(pcds->lpData);
@@ -77,8 +77,13 @@ void MainWindow::closeSerialPort() {
   showStatusMessage(tr("Rozłączono"));
 }
 
-void MainWindow::handleError(const QString& error) {
-  QMessageBox::critical(this, tr("Critical Error"), error);
+void MainWindow::handleError(const QStringList& errorsList) {
+    QString errorsToShow;
+    for(auto& error : errorsList){
+        errorsToShow += error;
+        errorsToShow += '\n';
+    }
+  QMessageBox::critical(this, tr("Critical Error"), errorsToShow);
 }
 
 void MainWindow::showAboutDialog() {
@@ -114,21 +119,7 @@ void MainWindow::on_fileOpenButton_released() {
 }
 
 void MainWindow::on_sendButton_released() {
-  for (auto& command : mCommandList) {
-    QByteArray data("\x1bP");
-    data += command;
-    data += getCheckSum(command);
-    data += "\x1b\\";
-    mSerialPortManager.writeData(data);
-  }
-}
-
-char MainWindow::getCheckSum(const QByteArray& data) {
-  char out = static_cast<char>(0xFF);
-  for (char ch : data) {
-    out = out ^ ch;
-  }
-  return out;
+    mSerialPortManager.writeCommands(mCommandList);
 }
 
 void MainWindow::on_cancelButton_released() {
@@ -142,8 +133,6 @@ void MainWindow::on_cancelButton_released() {
 void MainWindow::makeConnections() {
   connect(&mSerialPortManager, &SerialPortManager::serialPortError, this,
           &MainWindow::handleError);
-  connect(&mSerialPortManager, &SerialPortManager::readDataFromPort, this,
-          &MainWindow::handleDataFromPort);
   connect(ui->actionUstawienia_portu, &QAction::triggered, mSettings,
           &SettingsDialog::show);
   connect(ui->actionAbout_Qt, &QAction::triggered, this,
@@ -184,7 +173,7 @@ void MainWindow::handleOpenedFile(QString& fileContent) {
 }
 
 bool MainWindow::parseFileContent(QString& fileContent) {
-  fileContent.replace(QRegularExpression(" CR "), "\r");
+  fileContent.replace("<CR>", "\r");
   mFileContent = QJsonDocument::fromJson(fileContent.toLocal8Bit());
   QJsonObject jsonObject = mFileContent.object();
   if (jsonObject.keys().size() != 2) {
@@ -229,7 +218,3 @@ void MainWindow::fillTableRow(const int& currentRow,
 }
 
 void MainWindow::clearTableWidget() { ui->tableWidget->setRowCount(0); }
-
-void MainWindow::handleDataFromPort(const QByteArray& data) {
-  showStatusMessage(QString("Odebrano dane: ") + data);
-}

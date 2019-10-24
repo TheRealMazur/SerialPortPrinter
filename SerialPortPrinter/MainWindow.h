@@ -40,7 +40,7 @@ class MainWindow : public QMainWindow {
   void dropEvent(QDropEvent *event);
   void openSerialPort();
   void closeSerialPort();
-  void handleError(const QString &error);
+  void handleError(const QStringList &errorsList);
   void showAboutDialog();
   void showAboutQtDialog();
 
@@ -50,7 +50,6 @@ class MainWindow : public QMainWindow {
   void on_cancelButton_released();
 
  private:
-  char getCheckSum(const QByteArray &data);
   void makeConnections();
   void showStatusMessage(const QString &message);
   void openFileAndReadContent(const QString &fileName);

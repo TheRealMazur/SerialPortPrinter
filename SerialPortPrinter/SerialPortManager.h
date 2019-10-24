@@ -14,17 +14,19 @@ class SerialPortManager : public QObject {
   SerialPortManager();
   bool openSerialPort(const SettingsDialog::Settings& settings);
   void closeSerialPort();
-  void writeData(const QByteArray& data);
   bool isPortOpen();
+  void writeCommands(const QList<QByteArray>& commandsList);
  public slots:
   void readData();
   void handleError(QSerialPort::SerialPortError error);
  signals:
-  void serialPortError(const QString& error);
-  void readDataFromPort(const QByteArray& dataGot);
+  void serialPortError(const QStringList& error);
 
  private:
+  char getCheckSum(const QByteArray &data);
+  void writeData(const QByteArray& data);
   QSerialPort mSerial;
+  QStringList mErrorBuffer;
 };
 
 #endif  // SERIALPORTMANAGER_H
