@@ -78,11 +78,11 @@ void MainWindow::closeSerialPort() {
 }
 
 void MainWindow::handleError(const QStringList& errorsList) {
-    QString errorsToShow;
-    for(auto& error : errorsList){
-        errorsToShow += error;
-        errorsToShow += '\n';
-    }
+  QString errorsToShow;
+  for (auto& error : errorsList) {
+    errorsToShow += error;
+    errorsToShow += '\n';
+  }
   QMessageBox::critical(this, tr("Critical Error"), errorsToShow);
 }
 
@@ -119,7 +119,7 @@ void MainWindow::on_fileOpenButton_released() {
 }
 
 void MainWindow::on_sendButton_released() {
-    mSerialPortManager.writeCommands(mCommandList);
+  mSerialPortManager.writeCommands(mCommandList);
 }
 
 void MainWindow::on_cancelButton_released() {
@@ -186,6 +186,7 @@ bool MainWindow::parseFileContent(QString& fileContent) {
 }
 
 void MainWindow::getCommandsFromJson(const QJsonObject& jsonObject) {
+  mCommandList.clear();
   QJsonArray dataArray = jsonObject.value("data").toArray();
   for (auto value : dataArray) {
     mCommandList.append(value.toString().toLocal8Bit());

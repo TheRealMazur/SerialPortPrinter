@@ -35,7 +35,7 @@ void SerialPortManager::writeCommands(const QList<QByteArray>& commandsList) {
     }
     QByteArray data("\x1bP");
     data += command;
-    data += getCheckSum(command);
+    data += QString::number(getCheckSum(command), 16).right(2).toUpper();
     data += "\x1b\\";
     data += '\x10';
     writeData(data);
