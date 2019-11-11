@@ -7,14 +7,13 @@ SerialPortManager::SerialPortManager() {
           &SerialPortManager::readData);
 }
 
-bool SerialPortManager::openSerialPort(
-    const SettingsDialog::Settings& settings) {
-  mSerial.setPortName(settings.name);
-  mSerial.setBaudRate(settings.baudRate);
-  mSerial.setDataBits(settings.dataBits);
-  mSerial.setParity(settings.parity);
-  mSerial.setStopBits(settings.stopBits);
-  mSerial.setFlowControl(settings.flowControl);
+bool SerialPortManager::openSerialPort(const QString& portName) {
+  mSerial.setPortName(portName);
+  mSerial.setBaudRate(QSerialPort::Baud9600);
+  mSerial.setDataBits(QSerialPort::Data8);
+  mSerial.setParity(QSerialPort::NoParity);
+  mSerial.setStopBits(QSerialPort::OneStop);
+  mSerial.setFlowControl(QSerialPort::NoFlowControl);
   if (mSerial.open(QIODevice::ReadWrite)) {
     return true;
   } else {
@@ -53,13 +52,13 @@ char SerialPortManager::getCheckSum(const QByteArray& data) {
 void SerialPortManager::writeData(const QByteArray& data) {
   qint64 numOfBytesWritten = mSerial.write(data);
   if (numOfBytesWritten != data.size()) {
-    emit serialPortError(
-        QStringList(QString("Did not write all bytes. Wrote %1 byte(s) from %2.")
+    emit serialPortError(QStringList(
+        QString("Did not write all bytes. Wrote %1 byte(s) from %2.")
             .arg(numOfBytesWritten)
             .arg(data.size())));
   }
-  if(mSerial.waitForReadyRead(1000)){
-      readData();
+  if (mSerial.waitForReadyRead(1000)) {
+    readData();
   }
 }
 
@@ -76,9 +75,9 @@ void SerialPortManager::readData() {
       if (byte & 0x2) errors.append("Brak papieru");
     }
   }
-  if(!errors.isEmpty()){
-      mErrorBuffer.append(errors);
-      emit serialPortError(errors);
+  if (!errors.isEmpty()) {
+    mErrorBuffer.append(errors);
+    emit serialPortError(errors);
   }
 }
 

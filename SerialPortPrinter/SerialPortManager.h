@@ -6,13 +6,12 @@
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
 
-#include "settingsdialog.h"
 
 class SerialPortManager : public QObject {
   Q_OBJECT
  public:
   SerialPortManager();
-  bool openSerialPort(const SettingsDialog::Settings& settings);
+  bool openSerialPort(const QString& portName);
   void closeSerialPort();
   bool isPortOpen();
   void writeCommands(const QList<QByteArray>& commandsList);

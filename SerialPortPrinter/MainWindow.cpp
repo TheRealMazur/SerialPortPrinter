@@ -1,12 +1,11 @@
 #include "MainWindow.h"
 
+#include <QSerialPortInfo>
+
 #include "ui_MainWindow.h"
 
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent),
-      mSettings(new SettingsDialog),
-      mSerialPortManager(),
-      ui(new Ui::MainWindow) {
+    : QMainWindow(parent), mSerialPortManager(), ui(new Ui::MainWindow) {
   setAcceptDrops(true);
   ui->setupUi(this);
   ui->fileNameLabel->hide();
@@ -17,11 +16,14 @@ MainWindow::MainWindow(QWidget* parent)
   if (QApplication::arguments().size() > 1) {
     openFileAndReadContent(QApplication::arguments().last());
   }
+  for (const QSerialPortInfo& port : QSerialPortInfo::availablePorts()) {
+    ui->portNameComboBox->addItem(port.portName());
+  }
 }
 
 MainWindow::~MainWindow() {
+  closeSerialPort();
   delete ui;
-  delete mSettings;
 }
 
 bool MainWindow::nativeEvent(const QByteArray& eventType, void* message,
@@ -52,30 +54,17 @@ void MainWindow::dropEvent(QDropEvent* event) {
   openFileAndReadContent(filePath);
 }
 
-void MainWindow::openSerialPort() {
-  if (mSerialPortManager.openSerialPort(mSettings->settings())) {
-    ui->portOpenButton->setText("Rozłącz");
-    if (!mFileContent.isEmpty()) {
-      ui->sendButton->setEnabled(true);
-    }
-    ui->actionUstawienia_portu->setEnabled(false);
+bool MainWindow::openSerialPort() {
+  if (mSerialPortManager.openSerialPort(ui->portNameComboBox->currentText())) {
     showStatusMessage(tr("Połączono"));
+    return true;
   } else {
-    ui->portOpenButton->setText("Połącz");
-    ui->sendButton->setEnabled(false);
-    ui->actionUstawienia_portu->setEnabled(true);
     showStatusMessage(tr("Błąd połączenia"));
+    return false;
   }
 }
 
-void MainWindow::closeSerialPort() {
-  mSerialPortManager.closeSerialPort();
-  ui->portOpenButton->setText("Połącz");
-  ui->sendButton->setEnabled(false);
-
-  ui->actionUstawienia_portu->setEnabled(true);
-  showStatusMessage(tr("Rozłączono"));
-}
+void MainWindow::closeSerialPort() { mSerialPortManager.closeSerialPort(); }
 
 void MainWindow::handleError(const QStringList& errorsList) {
   QString errorsToShow;
@@ -91,7 +80,7 @@ void MainWindow::showAboutDialog() {
   msgBox.setTextFormat(Qt::RichText);
   msgBox.setWindowTitle("O programie");
   msgBox.setText(
-      "SerialPortPrinter v0.4.3<br>"
+      "SerialPortPrinter v0.6.0<br>"
       "This software is licensed under LGPLv3 License<br>"
       "Created with <a href=\"https://www.qt.io/\">Qt 5.13.1</a><br>"
       "More info under:<br>"
@@ -102,14 +91,6 @@ void MainWindow::showAboutDialog() {
 
 void MainWindow::showAboutQtDialog() { QMessageBox::aboutQt(this); }
 
-void MainWindow::on_portOpenButton_released() {
-  if (mSerialPortManager.isPortOpen()) {
-    closeSerialPort();
-  } else {
-    openSerialPort();
-  }
-}
-
 void MainWindow::on_fileOpenButton_released() {
   QString fileName = QFileDialog::getOpenFileName(this, tr("Wybierz plik"), "",
                                                   tr("Pliki druku (*.rct)"));
@@ -119,13 +100,22 @@ void MainWindow::on_fileOpenButton_released() {
 }
 
 void MainWindow::on_sendButton_released() {
-  mSerialPortManager.writeCommands(mCommandList);
+  ui->sendButton->setEnabled(false);
+  if (openSerialPort()) {
+    mSerialPortManager.writeCommands(mCommandList);
+    closeSerialPort();
+  } else {
+    QMessageBox::critical(this, tr("Critical Error"),
+                          "Nie udało się otworzyć portu!");
+  }
+  ui->sendButton->setEnabled(true);
 }
 
 void MainWindow::on_cancelButton_released() {
   if (mSerialPortManager.isPortOpen()) {
     closeSerialPort();
   }
+  ui->sendButton->setEnabled(false);
   clearTableWidget();
   ui->fileNameLabel->hide();
 }
@@ -133,8 +123,7 @@ void MainWindow::on_cancelButton_released() {
 void MainWindow::makeConnections() {
   connect(&mSerialPortManager, &SerialPortManager::serialPortError, this,
           &MainWindow::handleError);
-  connect(ui->actionUstawienia_portu, &QAction::triggered, mSettings,
-          &SettingsDialog::show);
+  connect(ui->actionWy_cz, &QAction::triggered, this, &MainWindow::close);
   connect(ui->actionAbout_Qt, &QAction::triggered, this,
           &MainWindow::showAboutQtDialog);
   connect(ui->actionInformacje, &QAction::triggered, this,
@@ -164,9 +153,7 @@ void MainWindow::openFileAndReadContent(const QString& fileName) {
 void MainWindow::handleOpenedFile(QString& fileContent) {
   if (parseFileContent(fileContent)) {
     this->statusBar()->showMessage("Otwarto plik.");
-    if (mSerialPortManager.isPortOpen()) {
-      ui->sendButton->setEnabled(true);
-    }
+    ui->sendButton->setEnabled(true);
   } else {
     QMessageBox::warning(this, "Błąd pliku", "Błędna zawartość pliku");
   }

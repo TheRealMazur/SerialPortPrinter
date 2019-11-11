@@ -24,11 +24,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QPushButton" name="portOpenButton">
-        <property name="text">
-         <string>Połącz</string>
-        </property>
-       </widget>
+       <widget class="QComboBox" name="portNameComboBox"/>
       </item>
       <item>
        <spacer name="horizontalSpacer">
@@ -178,7 +174,7 @@
     <property name="title">
      <string>Menu</string>
     </property>
-    <addaction name="actionUstawienia_portu"/>
+    <addaction name="actionWy_cz"/>
    </widget>
    <widget class="QMenu" name="menuO_Programie">
     <property name="title">
@@ -204,6 +200,11 @@
   <action name="actionAbout_Qt">
    <property name="text">
     <string>About Qt</string>
+   </property>
+  </action>
+  <action name="actionWy_cz">
+   <property name="text">
+    <string>Wyłącz</string>
    </property>
   </action>
  </widget>

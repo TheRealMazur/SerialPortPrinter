@@ -17,7 +17,6 @@
 #include <QtSerialPort/QSerialPortInfo>
 
 #include "SerialPortManager.h"
-#include "settingsdialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -38,13 +37,12 @@ class MainWindow : public QMainWindow {
  private slots:
   void dragEnterEvent(QDragEnterEvent *event);
   void dropEvent(QDropEvent *event);
-  void openSerialPort();
+  bool openSerialPort();
   void closeSerialPort();
   void handleError(const QStringList &errorsList);
   void showAboutDialog();
   void showAboutQtDialog();
 
-  void on_portOpenButton_released();
   void on_fileOpenButton_released();
   void on_sendButton_released();
   void on_cancelButton_released();
@@ -62,7 +60,6 @@ class MainWindow : public QMainWindow {
   void handleDataFromPort(const QByteArray &data);
   QJsonDocument mFileContent = {};
   QList<QByteArray> mCommandList;
-  SettingsDialog *mSettings = nullptr;
   SerialPortManager mSerialPortManager;
   Ui::MainWindow *ui = nullptr;
 };

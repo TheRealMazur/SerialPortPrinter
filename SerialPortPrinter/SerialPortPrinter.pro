@@ -14,17 +14,14 @@ QMAKE_LFLAGS = -static -static-libgcc
 SOURCES += \
     SerialPortManager.cpp \
     main.cpp \
-    MainWindow.cpp \
-    settingsdialog.cpp
+    MainWindow.cpp
 
 HEADERS += \
     MainWindow.h \
-    SerialPortManager.h \
-    settingsdialog.h
+    SerialPortManager.h
 
 FORMS += \
-    MainWindow.ui \
-    settingsdialog.ui
+    MainWindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
