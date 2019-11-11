@@ -10,31 +10,27 @@ Example file content:
 ```javascript
 {
   "data": [
-    "2 ; 0",
-    "1 ; $l Order1 CR 1 CR A / 13.00 / 13.00",
-    "2 ; $l Order2 CR 2 CR A / 12.00 / 24.00",
-    "1 ; 1 $b 37.00 / Credit Card",
-    "1; $e Restaurant Name CR 0 / 37.00",
-    "28; 1 $z"
+    "1#e",
+    "1$d",
+    "0$h",
+    "1;0;0;$lOrder 1<CR>1<CR>A/0.01/0.01/",
+    "1;1$b0.01/Credit Card<CR>",
+    "1;$ePark Cafe<CR>0/0.01",
+    "12$z",
+    "28;0$z"
   ],
   "preview": {
     "1": {
-      "name": "Order1",
-      "amount": "1",
-      "price": "13.00",
-      "total": "13.00"
-    },
-    "2": {
-      "name": "Order2",
-      "amount": "2",
-      "price": "12.00",
-      "total": "24.00"
+      "name": "Order 1",
+      "amount": 1,
+      "price": "0.01",
+      "total": "0.01"
     }
   }
 }
 ```
 
-The programm automatically converts **"CR"** to **"\r"** inside the commads.
+The programm automatically converts **"\<CR\>"** to **"\r"** inside the commads.
 
 It also calculates the chechsum for every command and wraps the commands into a structure defined in the printers protocol:
 
