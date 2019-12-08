@@ -84,8 +84,8 @@ void MainWindow::showAboutDialog() {
       "This software is licensed under LGPLv3 License<br>"
       "Created with <a href=\"https://www.qt.io/\">Qt 5.13.1</a><br>"
       "More info under:<br>"
-      "<a href=\"https://github.com/krzmazur1/SerialPortPrinter\">"
-      "https://github.com/krzmazur1/SerialPortPrinter</a>");
+      "<a href=\"https://github.com/TheRealMazur/SerialPortPrinter\">"
+      "https://github.com/TheRealMazur/SerialPortPrinter</a>");
   msgBox.exec();
 }
 
