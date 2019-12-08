@@ -57,9 +57,6 @@ void SerialPortManager::writeData(const QByteArray& data) {
             .arg(numOfBytesWritten)
             .arg(data.size())));
   }
-  if (mSerial.waitForReadyRead(1000)) {
-    readData();
-  }
 }
 
 bool SerialPortManager::isPortOpen() { return mSerial.isOpen(); }
